@@ -79,8 +79,10 @@ class Snake(GameObject):
             self.direction = new_direction
 
     def move(self):
-        """Перемещает змейку, добавляя новый сегмент головы и удаляя хвост,
-        если змейка не растёт."""
+        """
+        Перемещает змейку, добавляя новый сегмент головы и удаляя хвост,
+        если змейка не растёт.
+        """
         head_x, head_y = self.positions[0]
         new_x = (head_x + self.direction[0] * GRID_SIZE) % SCREEN_WIDTH
         new_y = (head_y + self.direction[1] * GRID_SIZE) % SCREEN_HEIGHT
