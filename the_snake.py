@@ -1,4 +1,5 @@
 from random import randint
+
 import pygame as pg
 
 # Константы для размеров поля и сетки:
@@ -18,6 +19,7 @@ BOARD_BACKGROUND_COLOR = (0, 0, 0)
 BORDER_COLOR = (93, 216, 228)
 APPLE_COLOR = (255, 0, 0)
 SNAKE_COLOR = (0, 255, 0)
+WHITE_COLOR = (255, 255, 255)
 
 # Скорость движения змейки:
 SPEED = 10
@@ -32,24 +34,24 @@ clock = pg.time.Clock()
 class GameObject:
     """Базовый класс для игровых объектов с позицией и цветом."""
 
-    def __init__(self, body_color=(255, 255, 255)):
+    def __init__(self, body_color=WHITE_COLOR):
         self.position = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
         self.body_color = body_color
 
     def draw(self):
-        """Абстрактный метод для отрисовки объекта на экране."""
+        """Отрисовывает объект на экране."""
         pass
 
 
 class Apple(GameObject):
     """Класс для создания яблока на игровом поле."""
 
-    def __init__(self, body_color=APPLE_COLOR):
+    def __init__(self, body_color=APPLE_COLOR, occupied_positions=[]):
         super().__init__(body_color)
-        self.randomize_position()
+        self.randomize_position(occupied_positions)
 
     def randomize_position(self, occupied_positions=[]):
-        """Устанавливает яблоко в случайную позицию на игровом поле."""
+        """Устанавливает яблоко в случайную позицию, не совпадающую с занятыми."""
         while True:
             self.position = (randint(0, GRID_WIDTH - 1) * GRID_SIZE,
                              randint(0, GRID_HEIGHT - 1) * GRID_SIZE)
@@ -99,8 +101,6 @@ class Snake(GameObject):
             self.reset()
         else:
             self.positions.insert(0, new_head_position)
-
-            # Проверка на рост змейки
             if not self.grew:
                 self.positions.pop()
             self.grew = False
@@ -128,29 +128,26 @@ def handle_keys(snake):
             pg.quit()
             raise SystemExit
         elif event.type == pg.KEYDOWN:
-            if event.key == pg.K_UP and snake.direction != DOWN:
-                snake.next_direction = UP
-            elif event.key == pg.K_DOWN and snake.direction != UP:
-                snake.next_direction = DOWN
-            elif event.key == pg.K_LEFT and snake.direction != RIGHT:
-                snake.next_direction = LEFT
-            elif event.key == pg.K_RIGHT and snake.direction != LEFT:
-                snake.next_direction = RIGHT
+            if event.key == pg.K_UP:
+                snake.update_direction(UP)
+            elif event.key == pg.K_DOWN:
+                snake.update_direction(DOWN)
+            elif event.key == pg.K_LEFT:
+                snake.update_direction(LEFT)
+            elif event.key == pg.K_RIGHT:
+                snake.update_direction(RIGHT)
 
 
 def main():
     """Основной игровой цикл."""
-    apple = Apple()
     snake = Snake()
+    apple = Apple(occupied_positions=snake.positions)
 
     while True:
         clock.tick(SPEED)
         handle_keys(snake)
 
-        # Обновление направления и перемещение змейки
-        if snake.next_direction:
-            snake.update_direction(snake.next_direction)
-            snake.next_direction = None
+        # Перемещение змейки
         snake.move()
 
         # Проверка на поедание яблока
