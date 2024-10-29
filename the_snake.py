@@ -51,7 +51,10 @@ class Apple(GameObject):
         self.randomize_position(occupied_positions)
 
     def randomize_position(self, occupied_positions=[]):
-        """Устанавливает яблоко в случайную позицию, не совпадающую с занятыми."""
+        """
+        Устанавливает яблоко в случайную позицию,
+        не совпадающую с занятыми.
+        """
         while True:
             self.position = (randint(0, GRID_WIDTH - 1) * GRID_SIZE,
                              randint(0, GRID_HEIGHT - 1) * GRID_SIZE)
