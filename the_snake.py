@@ -99,14 +99,10 @@ class Snake(GameObject):
         new_y = (head_y + dy * GRID_SIZE) % SCREEN_HEIGHT
         new_head_position = (new_x, new_y)
 
-        # Проверяем столкновение с собой
-        if new_head_position in self.positions[1:]:
-            self.reset()
-        else:
-            self.positions.insert(0, new_head_position)
-            if not self.grew:
-                self.positions.pop()
-            self.grew = False
+        self.positions.insert(0, new_head_position)
+        if not self.grew:
+            self.positions.pop()
+        self.grew = False
 
     def grow(self):
         """Увеличивает длину змейки после поедания яблока."""
@@ -150,8 +146,11 @@ def main():
         clock.tick(SPEED)
         handle_keys(snake)
 
-        # Перемещение змейки
         snake.move()
+
+        # Проверка на столкновение с собой
+        if snake.get_head_position() in snake.positions[1:]:
+            snake.reset()
 
         # Проверка на поедание яблока
         if snake.get_head_position() == apple.position:
